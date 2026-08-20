@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     let pokeButton = document.getElementById("poke-button");
+    let buscaButton = document.getElementById("busca-button");
 
     //API Pokemon:
     pokeButton.addEventListener("click", async () => {
         try {
             let pokeInputText = document.getElementById("pokemon").value;
-        
+
             if (!pokeInputText)
                 return alert("Campo de nome/id vazio!");
 
@@ -21,34 +22,42 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("poke-tipos").textContent = data.types.map(t => t.type.name).join(", ");
             document.getElementById("poke-altura").textContent = (data.height / 10) + " m";
             document.getElementById("poke-peso").textContent = (data.weight / 10) + " kg";
-            document.getElementById("poke-forms").textContent = data.forms.map(f => f.name).join(", ");
-            document.getElementById("poke-abilities").textContent = data.abilities.map(a => a.ability.name).join(", ");
-            document.getElementById("poke-sprites").textContent = data.abilities.map(a => a.ability.name).join(", ");
-            let sprites = [
-    data.sprites.front_default,
-    data.sprites.back_default,
-    data.sprites.front_shiny,
-    data.sprites.back_shiny
-];
-
-let galeria = document.getElementById("poke-galeria"); // uma <div id="poke-galeria"></div> no HTML
-galeria.innerHTML = ""; // limpa antes de adicionar de novo
-
-sprites.forEach(url => {
-    if (url) {
-        let img = document.createElement("img");
-        img.src = url;
-        img.style.width = "80px";
-        galeria.appendChild(img);
-    }
-});
-
-
+            document.getElementById("poke-games").textContent = data.game_indices.length + " jogos";
+            document.getElementById("poke-ability").textContent = data.abilities.map(t => t.ability.name).join(", ");
         } catch (error) {
             console.log("Erro: " + error);
         }
-
     });
 
-   
+    //API Studio Ghibli:
+    buscaButton.addEventListener("click", async () => {
+        try {
+            let filmeInputText = document.getElementById("filme").value;
+
+            if (!filmeInputText)
+                return alert("Campo de busca vazio!");
+
+            let response = await fetch("https://ghibliapi.vercel.app/films");
+            let data = await response.json();
+
+            let filmeEncontrado = data.find(filme =>
+                filme.title.toLowerCase().includes(filmeInputText.toLowerCase())
+            );
+
+            if (!filmeEncontrado) {
+                return alert("Filme não encontrado!");
+            }
+
+            document.getElementById("filme-img").src = filmeEncontrado.image;
+            document.getElementById("filme-titulo").textContent = filmeEncontrado.title;
+            document.getElementById("filme-diretor").textContent = filmeEncontrado.director;
+            document.getElementById("filme-ano").textContent = filmeEncontrado.release_date;
+            document.getElementById("filme-duracao").textContent = filmeEncontrado.running_time + " min";
+            document.getElementById("filme-nota").textContent = filmeEncontrado.rt_score;
+            document.getElementById("filme-descricao").textContent = filmeEncontrado.description;
+        } catch (error) {
+            console.log("Erro: " + error);
+        }
+    });
+
 });
